@@ -15,6 +15,7 @@ import RevisionsStore from "stores/RevisionsStore";
 import SharesStore from "stores/SharesStore";
 import UiStore from "stores/UiStore";
 import Document from "models/Document";
+import Share from "models/Share";
 import Revision from "models/Revision";
 import Error404 from "scenes/Error404";
 import ErrorOffline from "scenes/ErrorOffline";
@@ -42,6 +43,7 @@ type Props = {|
 @observer
 class DataLoader extends React.Component<Props> {
   @observable document: ?Document;
+  @observable share: ?Share;
   @observable revision: ?Revision;
   @observable error: ?Error;
 
@@ -192,11 +194,12 @@ class DataLoader extends React.Component<Props> {
       // Prevents unauthorized request to load share information for the document
       // when viewing a public share link
       if (can.read) {
-        this.props.shares.fetch(document.id).catch((err) => {
-          if (!(err instanceof NotFoundError)) {
-            throw err;
-          }
-        });
+       try {
+         this.share = await this.props.shares.fetch(document.id);
+       } catch (err) {
+         this.error = err;
+         return;
+       }
       }
 
       const isMove = this.props.location.pathname.match(/move$/);
@@ -225,6 +228,7 @@ class DataLoader extends React.Component<Props> {
     }
 
     const document = this.document;
+    const share = this.share;
     const revision = this.revision;
 
     if (!document) {
@@ -243,6 +247,7 @@ class DataLoader extends React.Component<Props> {
         {this.isEditing && <HideSidebar ui={ui} />}
         <DocumentComponent
           document={document}
+          share={share}
           revision={revision}
           abilities={abilities}
           location={location}

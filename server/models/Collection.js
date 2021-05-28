@@ -124,6 +124,19 @@ Collection.associate = (models) => {
   Collection.belongsTo(models.Team, {
     as: "team",
   });
+  Collection.hasMany(models.Share, {
+    as: "shares",
+    foreignKey: "collectionId",
+    onDelete: "cascade",
+  })
+  Collection.addScope("withShares", {
+    include: [
+      {
+        model: models.Share,
+        as: "shares",
+      }
+    ]
+  });
   Collection.addScope("withMembership", (userId) => ({
     include: [
       {

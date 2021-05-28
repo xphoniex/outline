@@ -25,6 +25,7 @@ import PageTitle from "components/PageTitle";
 import Time from "components/Time";
 import Container from "./Container";
 import Contents from "./Contents";
+import ShareTable from "./ShareTable";
 import Editor from "./Editor";
 import Header from "./Header";
 import KeyboardShortcutsButton from "./KeyboardShortcutsButton";
@@ -323,8 +324,14 @@ class DocumentScene extends React.Component<Props> {
       : [];
     const showContents = ui.tocVisible && readOnly;
 
+    const shareTable = this.props.share?.table || [];
+
     return (
       <ErrorBoundary>
+      <BackgroundContainer>
+        {isShare && 
+        shareTable.length > 1 && 
+        <ShareTable headings={shareTable} shareId={match.params.shareId} />}
         <Background
           key={revision ? revision.id : document.id}
           isShare={isShare}
@@ -460,6 +467,7 @@ class DocumentScene extends React.Component<Props> {
           <Branding href="//www.getoutline.com?ref=sharelink" />
         )}
         {!isShare && <KeyboardShortcutsButton />}
+      </BackgroundContainer>
       </ErrorBoundary>
     );
   }
@@ -505,3 +513,9 @@ const MaxWidth = styled(Flex)`
 export default withRouter(
   inject("ui", "auth", "policies", "revisions")(DocumentScene)
 );
+
+const BackgroundContainer = styled(Flex)`
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+`

@@ -17,7 +17,7 @@ router.post("shares.info", auth(), async (ctx) => {
   ctx.assertUuid(id || documentId, "id or documentId is required");
 
   const user = ctx.state.user;
-  const share = await Share.findOne({
+  const share = await Share.scope("defaultScope", "withCollection").findOne({
     where: id
       ? {
           id,
@@ -137,6 +137,7 @@ router.post("shares.create", auth(), async (ctx) => {
       documentId,
       teamId: user.teamId,
       revokedAt: null,
+      collectionId: document.collectionId,
     },
     defaults: {
       userId: user.id,

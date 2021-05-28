@@ -36,11 +36,20 @@ Share.associate = (models) => {
     as: "document",
     foreignKey: "documentId",
   });
+  Share.belongsTo(models.Collection.scope("withShares"), {
+    as: "collection",
+    foreignKey: "collectionId",
+  });
   Share.addScope("defaultScope", {
     include: [
       { association: "user", paranoid: false },
       { association: "document" },
       { association: "team" },
+    ],
+  });
+  Share.addScope("withCollection", {
+    include: [
+      { association: "collection" },
     ],
   });
 };
